@@ -20,15 +20,14 @@ function crossP(inAll_vector){
 
 
 function decision(cp1,cp2){
-    magnitude(cp1,cp2)
-    for(let i = 0; i < m; i++){
-        if(cp1[i] < 0 && cp2[i] > 0){
+    // magnitude(cp1,cp2) 
+        if((cp1[2]* cp2[2]) < 0){
             console.log("Intersect")
             return 1
         }
             console.log("Not Intersect")
          return 0
-    }
+    
 }
 
 function magnitude(cp1,cp2){
