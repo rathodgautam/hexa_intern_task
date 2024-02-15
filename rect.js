@@ -1,69 +1,113 @@
-// here one ray (point) consider inside if it intersect ony on vertex from outside
+//Final code for point in polygon
 
-// const points = [[1, 4, 0],[5,0.3,0], [6, 1, 0], [7, 10, 0], [2, 9, 0]];
+const points = [[1, 4, 0],[5,0.3,0], [6, 1, 0], [7, 10, 0], [2, 9, 0]];
 // const points = [[0, 0, 0], [5, 0, 0], [5, 5, 0], [0, 5, 0]];
 // const points = [[0, 5, 0],[5,2,0], [10, 0, 0], [10, 10, 0], [0, 10, 0]];
-const points = [[0, 5, 0],[8,0,0], [10, 8, 0], [10, 10, 0], [0, 10, 0]]; 
+// const points = [[0, 5, 0], [8, 0, 0], [10, 8, 0], [10, 10, 0], [0, 10, 0]];
 const xmax = 1000;
 // const points = [[1, 2, 0], [10, 2, 0], [10, 6, 0], [4, 5, 0], [4, 9, 0], [8, 9, 0], [8, 7, 0], [12, 7, 0], [12, 13, 0], [1, 11, 0]];
 // last touch on vertex exclude
 var boundbox = [], target = [];
-  var  vertex ;
-  let decision = [];
-  var int_count ; 
-const num = 5;
+
+let decision = [];
+var int_count;
+var wd, flagWD;
+const num = 100;
 if (num == 0) {
   throw new Error("Num is 0. Exiting script.");
 }
 
 
-function crossP(inAll_vector) {
-    console.log("inAll_vector",inAll_vector)
-  let cp1 = [], cp2 = [], cp3 = [], cp4 = [];
+function crossP(inAll_vector, Inp1, Inp2, Inq1, Inq2) {
+  console.log("crossP() :: inAll_vector", inAll_vector)
+  let cp11 = [], cp12 = [], cp21 = [], cp22 = [];
   let m = inAll_vector[0].length, n = inAll_vector.length;
 
   for (let j = 0; j < m; j++) {
-    cp1[j] = (inAll_vector[0][(j + 1) % m] * inAll_vector[1][(j + 2) % m]) - (inAll_vector[0][(j + 2) % m] * inAll_vector[1][(j + 1) % m])
-    cp2[j] = (inAll_vector[2][(j + 1) % m] * inAll_vector[3][(j + 2) % m]) - (inAll_vector[2][(j + 2) % m] * inAll_vector[3][(j + 1) % m])
+    cp11[j] = (inAll_vector[0][(j + 1) % m] * inAll_vector[1][(j + 2) % m]) - (inAll_vector[0][(j + 2) % m] * inAll_vector[1][(j + 1) % m])
 
-    cp3[j] = (inAll_vector[4][(j + 1) % m] * inAll_vector[5][(j + 2) % m]) - (inAll_vector[4][(j + 2) % m] * inAll_vector[5][(j + 1) % m])
-    cp4[j] = (inAll_vector[6][(j + 1) % m] * inAll_vector[7][(j + 2) % m]) - (inAll_vector[6][(j + 2) % m] * inAll_vector[7][(j + 1) % m])
+    cp12[j] = (inAll_vector[0][(j + 1) % m] * inAll_vector[2][(j + 2) % m]) - (inAll_vector[0][(j + 2) % m] * inAll_vector[2][(j + 1) % m])
+
+    cp21[j] = (inAll_vector[3][(j + 1) % m] * inAll_vector[4][(j + 2) % m]) - (inAll_vector[3][(j + 2) % m] * inAll_vector[4][(j + 1) % m])
+
+    cp22[j] = (inAll_vector[3][(j + 1) % m] * inAll_vector[5][(j + 2) % m]) - (inAll_vector[3][(j + 2) % m] * inAll_vector[5][(j + 1) % m])
 
   }
 
-  console.log('cp', cp1, cp2, cp3, cp4)
+  console.log('cp', cp11, cp12, cp21, cp22)
 
-  intOrNot(cp1, cp2, cp3, cp4)
-  // console.log(Math.sign(cp2[2]))
+  if ((cp11[2] * cp12[2]) == 0 || (cp21[2] * cp22[2]) == 0) {
+    // onEdge(points, Inp1)
+    console.log("rayonvertex()")
+    if (rayOnVertex(cp11, cp12, cp21, cp22, Inp1, Inp2, Inq1, Inq2)) {
+      flagWD = true
+    }
+  }
+  console.log("intOrNOt()")
+  intOrNot(cp11, cp12, cp21, cp22)
+  // console.log(Math.sign(cp12[2]))
 
   // return cp
 }
 
+// *******************************************
+// this fun return cross product
+// function crossPP(vector1,vector2) {
 
-function intOrNot(cp1, cp2, cp3, cp4) {
-//   // magnitude(cp1, cp2)
-//   //   for(let i = 0; i < m; i++){
-    if((cp1[2] * cp2[2]) == 0){
-        vertex = true
-        console.log("int count &  vertex true ",int_count)
-        console.log("cp1[2] * cp2[2]) is zero ")
-        console.log(vertex)
-    } else if((cp3[2] * cp4[2]) == 0){
-        vertex == true
-        console.log("int count  &  vertex true",int_count)
-        console.log("cp3[2] * cp4[2]) is zero ")
+//   let cp =[];
+//   let m = vector1[0].length;
 
-    }
+//   for (let j = 0; j < m; j++) {
+//     cp[j] = (vector1[(j + 1) % m] *  vector2[(j + 2) % m]) - (vector1[(j + 2) % m] *  vector2[(j + 1) % m]) 
 
-  console.log("(cp1[2] * cp2[2])  (cp3[2] * cp4[2])",cp1[2] * cp2[2], cp3[2] * cp4[2])
+//   }
+//     return cp
 
-  if ((cp1[2] * cp2[2]) < 0 && (cp3[2] * cp4[2]) < 0) {
-    int_count++;
-    console.log( int_count,"intersect");
-  } 
+// } 
+
+function rayOnVertex(cp11, cp12, cp21, cp22, Inp1, Inp2, Inq1, Inq2) {
+  if (cp11[2] == 0 && IsPointOnLine(Inq1, Inp1, Inp2)) {
+    (cp12[2] > 0) ? (wd++) : (wd--);
+    console.log("wd", wd)
+    console.log("cp11[2] is zero ", cp12[2])
+    return true
+  }
+  else if ((cp12[2]) == 0 && IsPointOnLine(Inq2, Inp1, Inp2)) {
+    (cp11[2] > 0) ? (wd++) : (wd--);
+    console.log("wd", wd)
+    console.log(" cp12[2]) is zero ", cp11[2])
+    return true
+  } else if (cp21[2] == 0 && IsPointOnLine(Inp1, Inq1, Inq2)) {
+    //check if point is inside of line or not
+    (cp22[2] > 0) ? (wd++) : (wd--);
+    console.log("wd", wd)
+    console.log("cp21[2]  is zero ", cp22[2])
+    return true
+  }
+  else if ((cp22[2]) == 0 && IsPointOnLine(Inp2, Inq1, Inq2)) {
+    (cp21[2] > 0) ? (wd++) : (wd--);
+    console.log("wd", wd)
+    console.log("cp22[2]) is zero ", cp21[2])
+    return true
+  }
+  return false;
 }
+
+function intOrNot(cp11, cp12, cp21, cp22) {
+  //   // magnitude(cp11, cp12)
+  //   //   for(let i = 0; i < m; i++){
+  console.log("(cp11[2] * cp12[2])  (cp21[2] * cp22[2])", cp11[2] * cp12[2], cp21[2] * cp22[2])
+
+  if ((cp11[2] * cp12[2]) < 0 && (cp21[2] * cp22[2]) < 0) {
+    int_count++;
+    console.log("intersect");
+  } else {
+    console.log("not intersect")
+  }  
+}
+
 function onEdge(inPoints, inTarget) {
-    console.log("Onedge checking")
+  console.log("Onedge checking")
   let edge = false;
   let n = inPoints.length, m = inPoints[0].length;
   let tx, ty, tz;
@@ -83,7 +127,10 @@ function onEdge(inPoints, inTarget) {
         flagE++;
       }
       if (flagE == 3) {
+        // IsPointOnLine(inTarget, inPoints[i], inPoints[(i + 1) % n])
         // t = P - p1 / p2 - p1
+        // t = P - p1 / p2 - p1
+        // console.log("flagE",flagE)
         tx = (inTarget[0] - inPoints[i][0]) / (inPoints[(i + 1) % n][0] - inPoints[i][0]);
         if (tx > 1 || tx < 0) {
           console.log("points is not on edge")
@@ -102,6 +149,7 @@ function onEdge(inPoints, inTarget) {
         // edge = true;
         console.log("point is on a edge");
         return true
+
       }
     }
 
@@ -110,21 +158,43 @@ function onEdge(inPoints, inTarget) {
   return false
 }
 
-// function magnitude(cp1,cp2){
-//   let  mag1 = 0,mag2 = 0;
-//  for(let i = 0; i < m; i++){
-//      mag1 +=(cp1[i]) * (cp1[i]);
-//      mag2 +=(cp1[i]) * (cp2[i]);
-//  }
-//  if(mag1 == 0 || mag2 == 0){
-//      console.log("one poin is on vertex ")
-//      return 0
-//  }
-// }
+function IsPointOnLine(inTarget, inPoints1, inPoints2) {
+  let tx, ty, tz;
+  tx = (inTarget[0] - inPoints1[0]) / (inPoints2[0] - inPoints1[0]);
+  if (tx > 1 || tx < 0) {
+    console.log("points is not on edge")
+    return false;
+  }
+  ty = (inTarget[1] - inPoints1[1]) / (inPoints2[1] - inPoints1[1]);
+  if (ty > 1 || ty < 0) {
+    console.log("points is not on edge")
+    return false;
+  }
+  tz = (inTarget[2] - inPoints1[2]) / (inPoints2[2] - inPoints1[2]);
+  if (tz > 1 || tz < 0) {
+    console.log("points is not on edge")
+    return false
+  }
+  // edge = true;
+  console.log("point is on a edge");
+  return true
+}
+
+function magnitude(cp11,cp12){
+  let  mag1 = 0,mag2 = 0;
+ for(let i = 0; i < m; i++){
+     mag1 +=(cp11[i]) * (cp11[i]);
+     mag2 +=(cp11[i]) * (cp12[i]);
+ }
+ if(mag1 == 0 || mag2 == 0){
+     console.log("one poin is on vertex ")
+     return 0
+ }
+}
 
 function onVertex(inPoints, inTarget) {
-    
-    console.log("onVeetex checking")
+
+  console.log("onVertex checking")
   let vertex = false, at = [];
   let n = inPoints.length, m = inPoints[0].length;;
   for (let i = 0; i < n; i++) {
@@ -146,44 +216,96 @@ function onVertex(inPoints, inTarget) {
 }
 
 function vectorDir(points, Inp1, xmax) {
+  console.log("vectorDir")
   int_count = 0;
   let n = points.length;
   let Inp2 = [xmax, Inp1[1], Inp1[2]]
-//   console.log("Inp1",Inp1)
-//   console.log("Inp2",Inp2)
-  // console.log(Inq2) 
+  console.log("Inp1", Inp1)
+  console.log("Inp2", Inp2)
+  // console.log(Inq2)
 
-  let vectorPQ11 = [], vectorPQ12 = [], vectorPQ21 = [], vectorPQ22 = [], vectorQP11 = [], vectorQP12 = [], vectorQP21 = [], vectorQP22 = [];
+  // let vectorPQ11 = [], vectorPQ12 = [], vectorPQ21 = [], vectorPQ22 = [], vectorQP11 = [], vectorQP12 = [], vectorQP21 = [], vectorQP22 = [];
+
+
+  let vectorPQ11 = [], vectorPP12 = [], vectorPQ12 = [], vectorQP11 = [], vectorQP12 = [], vectorQQ12 = [];
   let Inq1, Inq2;
+  wd = 0; flagWD = false;
+
   for (let i = 0; i < n; i++) {
     let all_vector = [],
       Inq1 = points[i], Inq2 = points[(i + 1) % n];
-     console.log("in points",Inp1,Inp2,Inq1,Inq2)
-    vectorPQ11 = [(Inq1[0] - Inp1[0]), (Inq1[1] - Inp1[1]), (Inq1[2] - Inp1[2])]
+    console.log("in points", Inp1, Inp2, Inq1, Inq2)
+    // vectorPQ11 = [(Inq1[0] - Inp1[0]), (Inq1[1] - Inp1[1]), (Inq1[2] - Inp1[2])]
 
-    vectorPQ21 = [(Inq1[0] - Inp2[0]), (Inq1[1] - Inp2[1]), (Inq1[2] - Inp2[2])]
+    // vectorPQ21 = [(Inq1[0] - Inp2[0]), (Inq1[1] - Inp2[1]), (Inq1[2] - Inp2[2])]
+
+    // vectorPQ12 = [(Inq2[0] - Inp1[0]), (Inq2[1] - Inp1[1]), (Inq2[2] - Inp1[2])]
+
+    // vectorPQ22 = [(Inq2[0] - Inp2[0]), (Inq2[1] - Inp2[1]), (Inq2[2] - Inp2[2])]
+
+
+    // vectorQP11 = [(Inp1[0] - Inq1[0]), (Inp1[1] - Inq1[1]), (Inp1[2] - Inq1[2])]
+
+    // vectorQP21 = [(Inp1[0] - Inq2[0]), (Inp1[1] - Inq2[1]), (Inp1[2] - Inq2[2])]
+
+    // vectorQP12 = [(Inp2[0] - Inq1[0]), (Inp2[1] - Inq1[1]), (Inp2[2] - Inq1[2])]
+
+    // vectorQP22 = [(Inp2[0] - Inq2[0]), (Inp2[1] - Inq2[1]), (Inp2[2] - Inq2[2])]
+
+    // checking with different vector
+
+
+    vectorPP12 = [(Inp2[0] - Inp1[0]), (Inp2[1] - Inp1[1]), (Inp2[2] - Inp1[2])]
+
+    vectorPQ11 = [(Inq1[0] - Inp1[0]), (Inq1[1] - Inp1[1]), (Inq1[2] - Inp1[2])]
 
     vectorPQ12 = [(Inq2[0] - Inp1[0]), (Inq2[1] - Inp1[1]), (Inq2[2] - Inp1[2])]
 
-    vectorPQ22 = [(Inq2[0] - Inp2[0]), (Inq2[1] - Inp2[1]), (Inq2[2] - Inp2[2])]
+    vectorQQ12 = [(Inq2[0] - Inq1[0]), (Inq2[1] - Inq1[1]), (Inq2[2] - Inq1[2])]
 
 
     vectorQP11 = [(Inp1[0] - Inq1[0]), (Inp1[1] - Inq1[1]), (Inp1[2] - Inq1[2])]
 
-    vectorQP21 = [(Inp1[0] - Inq2[0]), (Inp1[1] - Inq2[1]), (Inp1[2] - Inq2[2])]
 
     vectorQP12 = [(Inp2[0] - Inq1[0]), (Inp2[1] - Inq1[1]), (Inp2[2] - Inq1[2])]
 
-    vectorQP22 = [(Inp2[0] - Inq2[0]), (Inp2[1] - Inq2[1]), (Inp2[2] - Inq2[2])]
-
     // console.log(vector11,vector12,vector21,vector22)
-    all_vector.push(vectorPQ11, vectorPQ21, vectorPQ12, vectorPQ22, vectorQP11, vectorQP21, vectorQP12, vectorQP22);
-    crossP(all_vector)
+    all_vector.push(vectorPP12, vectorPQ11, vectorPQ12, vectorQQ12, vectorQP11, vectorQP12);
+    crossP(all_vector, Inp1, Inp2, Inq1, Inq2)
   };
-  console.log("vector dir int count",int_count)
-  return int_count
+
+
+  console.log("vector dir int count", int_count)
+  console.log("flagWD", flagWD)
+  console.log("wd final", wd)
+  if (flagWD) {
+    return(result(wd, int_count, flagWD))
+    
+  } else {
+    return int_count
+  }
 }
 
+
+function result(wd, int_count, flagWD) {
+
+  if (flagWD && (wd == 0) && (int_count % 2) == 0) {
+    console.log("FInal inside from result ")
+    return 1
+  } else if (flagWD && (wd == 0) && (int_count % 2) == 1) {
+    console.log("FInal outside from result")
+    return 1
+    
+  } else if (flagWD && (wd == 0) && (int_count % 2) == 1) {
+    console.log("FInal inside from result ")
+    return 0
+    
+  } else if (flagWD && (wd !== 0) && (int_count % 2) == 0) {
+    console.log("FInal outside from result")
+    return 0
+
+  }
+}
 
 function boundary(inPoints) {
 
@@ -205,7 +327,7 @@ function boundary(inPoints) {
   line_points(boundbox)
 }
 function line_points(inboundBox) {
-    console.log(inboundBox)
+  console.log(inboundBox)
   let boundLine = [];
   const boundbox = [];
   for (let k = 0; k < (inboundBox.length - 2); k++) {
@@ -240,33 +362,30 @@ function funAllPoints(inBoundLine) {
 
 // console.log(target)
 
-function inOrOut(points, target_p, xmax){ 
-        let d = vectorDir(points, target_p, xmax)
-        console.log("d", d)
-        // let d = vectorDir(points,[ 3.20000, 4.20000, 0 ],xmax) ;
-      
-        // console.log(int_count))
-        console.log("outside vertex true or not",vertex)
-        if((vertex == true)){ 
-            (d % 2 == 0)?  (decision.push(3)):  decision.push(4);
-        }
-        else if (d % 2 == 1) {
-          decision.push(3)
-          console.log("Intersect final",  target_p)
-        } else if (d % 2 == 0) {
-          decision.push(4)
-          console.log("outside")
-          console.log("Not Intersect final",  target_p)
-        } else {
-          decision.push(5)
-          console.log("not in bound")
-        }
+function inOrOut(points, target_p, xmax) {
+  console.log("inOrOut checking")
+  let d = vectorDir(points, target_p, xmax)
+  console.log("d", d)
+  // let d = vectorDir(points,[ 3.20000, 4.20000, 0 ],xmax) ;
+
+  // console.log(int_count)
+  if (d % 2 == 1) {
+    decision.push(3)
+    console.log("Intersect final", target_p)
+  } else if (d % 2 == 0) {
+    decision.push(4)
+    console.log("outside")
+    console.log("Not Intersect final", target_p)
+  } else {
+    decision.push(5)
+    console.log("not in bound")
+  }
 
 }
 
 
 function main() {
- 
+
   for (let i = 0; i < target.length; i++) {
     console.log(i + 1, target[i])
     if (onVertex(points, target[i])) {
@@ -276,17 +395,17 @@ function main() {
     else if (onEdge(points, target[i])) {
       decision.push(2)
       console.log("final edge")
-    }else{
-        console.log("inOrOut checking")
-        inOrOut(points, target[i], xmax)
+    } else {
+      inOrOut(points, target[i], xmax)
     }
-    vertex = false;
+
   }
-  console.log("deision",decision)
+  console.log("deision", decision)
 }
 
 //  vecterDir(p1,p2,q1,q2) 
-boundary(points) 
+boundary(points)
+
 main()
 
 export const x = { target, decision, points };
