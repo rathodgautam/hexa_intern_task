@@ -1,7 +1,27 @@
+
 //Final code for point in polygon
 
-const points = [[1, 4, 0],[5,0.3,0], [6, 1, 0], [7, 10, 0], [2, 9, 0]];
+// const points = [[1, 4, 0],[5,0.3,0], [6, 1, 0], [7, 10, 0], [2, 9, 0]];
 // const points = [[0, 0, 0], [5, 0, 0], [5, 5, 0], [0, 5, 0]];
+// const points =[[5.2936,	-2.0629,	0],[4.1692	,3.9538	,0],[2.5817	,-4.5346	,0],[0.4353,	5.2757,	0],[-2.0573,	4.5258	,0],[-3.3913	,3.6194	,0],[-4.3102	,2.2464	,0],[-4.3574	,-2.3185	,0],[-3.4031	,-3.4772	,0],[-2.1187	,-4.4592	,0],[-1.0269	,-4.8805	,0],[0.6146	,-5.1786	,0],[2.622	,-4.4428	,0],[4.0869	,-3.6286	,0],[5.4917	,-2.217	,0],
+// [5.2936	,2.0629	,0]] 
+const points = [[5.2751250664507, 0.7849801137441208,0], [12.622065187731776, 6.702958725931767,0], [5.720301365117938, 11.215791111126105,0], [3.830896207726779, 11.8716479180769,0], [0.5516121729728045, 2.424622131121109,0], [16.664506043720284, 5.607920339200787,0], [9.512656536551935, 15.451153603535237,0], [14.913783810803894, 13.638450433830778,0], [15.144309701785755, 17.179523223715847,0], [16.270824823945077, 13.229125977489728,0], [6.676058113028001, 5.508911304559945,0], [10.502881542071037, 6.799562386943836,0], [16.39886710463572, 0.03518189141661132,0], [6.542781594183209, 5.906987027847556,0], [0.1267556803524461, 7.483498297559043,0], [7.733936349008257, 12.43301986366734,0], [16.54709953721039, 2.3957841333883234,0], [19.090408281851065, 13.614143694711052,0], [7.053030591210783, 8.099302865242901,0], [11.946026826927412, 9.702217174586405,0], [11.6204236448561, 2.8974235991772535,0], [10.38214388462274, 12.55549942696825,0], [14.103316762880048, 11.292845996782164,0], [1.1957907188309425, 8.099142246827167,0], [0.760465758375477, 12.10141911776666,0]]; 
+// const points = [[6.7302,	0	,0],[5.5696,	3.9886,	0],[4.436	,4.9293,	0],[2.8475,	4.5983,	0],[1.1231	,4.2634,	0],[-1.9421,	4.3852,	0],[-1.8235	,4.3728,0],[-2.2206,	4.5529,	0],[-3.8116,	5.0711,	0],[-6.7561,	0.6644,	0],[-5.7035,	2.926,	0],[5.2936,	-2.0629,	0],[4.1692	,3.9538	,0],[2.5817	,-4.5346	,0],[0.4353,	5.2757,	0],[-2.0573,	4.5258	,0],[-3.3913	,3.6194	,0],[-4.3102	,2.2464	,0],[-4.3574	,-2.3185	,0],[-3.4031	,-3.4772	,0],[-2.1187	,-4.4592	,0],[-1.0269	,-4.8805	,0],[0.6146	,-5.1786	,0],[2.622	,-4.4428	,0],[4.0869	,-3.6286	,0],[5.4917	,-2.217	,0]]
+// [5.2936	,2.0629	,0]] 
+// -6.9928	-2.313	0
+// -5.8522	-3.1624	0
+// -4.8372	-3.6258	0
+// -2.1074	-4.6373	0
+// -0.9333	-4.6063	0
+// -1.0474	-4.2699	0
+// -1.2668	-4.4333	0
+// 0.1237	-4.6186	0
+// 1.4708	-4.3884	0
+// 1.2409	-4.3625	0
+// 1.5662	-4.6562	0
+// 2.1931	-5.0184	0
+// 5.5235	-3.8843	0
+// 6.4728	-2.853	0;
 // const points = [[0, 5, 0],[5,2,0], [10, 0, 0], [10, 10, 0], [0, 10, 0]];
 // const points = [[0, 5, 0], [8, 0, 0], [10, 8, 0], [10, 10, 0], [0, 10, 0]];
 const xmax = 1000;
@@ -127,28 +147,28 @@ function onEdge(inPoints, inTarget) {
         flagE++;
       }
       if (flagE == 3) {
-        // IsPointOnLine(inTarget, inPoints[i], inPoints[(i + 1) % n])
+        IsPointOnLine(inTarget, inPoints[i], inPoints[(i + 1) % n])
         // t = P - p1 / p2 - p1
         // t = P - p1 / p2 - p1
         // console.log("flagE",flagE)
-        tx = (inTarget[0] - inPoints[i][0]) / (inPoints[(i + 1) % n][0] - inPoints[i][0]);
-        if (tx > 1 || tx < 0) {
-          console.log("points is not on edge")
-          return false;
-        }
-        ty = (inTarget[1] - inPoints[i][1]) / (inPoints[(i + 1) % n][1] - inPoints[i][1]);
-        if (ty > 1 || ty < 0) {
-          console.log("points is not on edge")
-          return false;
-        }
-        tz = (inTarget[2] - inPoints[i][2]) / (inPoints[(i + 1) % n][2] - inPoints[i][2]);
-        if (tz > 1 || tz < 0) {
-          console.log("points is not on edge")
-          return false
-        }
-        // edge = true;
-        console.log("point is on a edge");
-        return true
+        // tx = (inTarget[0] - inPoints[i][0]) / (inPoints[(i + 1) % n][0] - inPoints[i][0]);
+        // if (tx > 1 || tx < 0) {
+        //   console.log("points is not on edge")
+        //   return false;
+        // }
+        // ty = (inTarget[1] - inPoints[i][1]) / (inPoints[(i + 1) % n][1] - inPoints[i][1]);
+        // if (ty > 1 || ty < 0) {
+        //   console.log("points is not on edge")
+        //   return false;
+        // }
+        // tz = (inTarget[2] - inPoints[i][2]) / (inPoints[(i + 1) % n][2] - inPoints[i][2]);
+        // if (tz > 1 || tz < 0) {
+        //   console.log("points is not on edge")
+        //   return false
+        // }
+        // // edge = true;
+        // console.log("point is on a edge");
+        // return true
 
       }
     }
@@ -180,17 +200,17 @@ function IsPointOnLine(inTarget, inPoints1, inPoints2) {
   return true
 }
 
-function magnitude(cp11,cp12){
-  let  mag1 = 0,mag2 = 0;
- for(let i = 0; i < m; i++){
-     mag1 +=(cp11[i]) * (cp11[i]);
-     mag2 +=(cp11[i]) * (cp12[i]);
- }
- if(mag1 == 0 || mag2 == 0){
-     console.log("one poin is on vertex ")
-     return 0
- }
-}
+// function magnitude(cp11,cp12){
+//   let  mag1 = 0,mag2 = 0;
+//  for(let i = 0; i < m; i++){
+//      mag1 +=(cp11[i]) * (cp11[i]);
+//      mag2 +=(cp11[i]) * (cp12[i]);
+//  }
+//  if(mag1 == 0 || mag2 == 0){
+//      console.log("one poin is on vertex ")
+//      return 0
+//  }
+// }
 
 function onVertex(inPoints, inTarget) {
 
@@ -294,11 +314,11 @@ function result(wd, int_count, flagWD) {
     return 1
   } else if (flagWD && (wd == 0) && (int_count % 2) == 1) {
     console.log("FInal outside from result")
-    return 1
-    
-  } else if (flagWD && (wd == 0) && (int_count % 2) == 1) {
-    console.log("FInal inside from result ")
     return 0
+    
+  } else if (flagWD && (wd !== 0) && (int_count % 2) == 1) {
+    console.log("FInal inside from result ")
+    return 1
     
   } else if (flagWD && (wd !== 0) && (int_count % 2) == 0) {
     console.log("FInal outside from result")
