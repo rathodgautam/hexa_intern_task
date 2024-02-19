@@ -38,23 +38,22 @@ function intersectOrNot(cp11, cp12, cp21, cp22) {
 }
 
 // checking point is on the edge or not
-function onEdge(inPoints, inTarget) {
-  let edge = false;
-  let n = inPoints.length, m = inPoints[0].length;
-  let tx, ty, tz;
+function onEdge(inPoints, inTarget) { 
+  let n = inPoints.length, m = inPoints[0].length; 
   let cp = [];
   let inAb = [], inAt = [];
 
   for (let i = 0; i < n; i++) {
+    console.log(inPoints[i], inPoints[(i + 1) % n])
     let p1 = inPoints[i], p2 = inPoints[(i + 1) % n];
 
     inAb[i] = createVector(p1, p2);
     inAt[i] = createVector(p1, inTarget)
-    cp[i] = crossProduct(inAb[i], inAt[i]);
+    cp[i] =   crossProduct(inAb[i], inAt[i]);
     let mag = magnitude(cp[i]);
 
     if (mag == 0) {
-      IsPointOnLine(inTarget, p1, p2)
+     return IsPointOnLine(inTarget, p1, p2)
     }
   }
   return false
@@ -124,18 +123,22 @@ function isInside(points, Inp1) {
     let isC = isCrossing(cp11, cp12, cp21, cp22, Inp1, Inp2, Inq1, Inq2, vertexHit)
     let f = isC.first, s = isC.second;
 
+    // if (f == true && s == true) {
+    //     ((i == 0) ? ( lastP = true ): (i++));
+    //   let c = vertexType(i, vectorPP12, vectorQQ12)
+    //   int_count += c;
+    // }
+    // else 
     if (f == true) {
-
-      ((i == 0) ?( lastP = true ): (i++));
-
       let c = vertexType(i, vectorPP12, vectorQQ12)
       int_count += c;
+      ((i == 0) ? ( lastP = true ): (i++));
 
     }
     else if (s == true) {
-      i++
       let c = vertexType(i + 1, vectorPP12, vectorQQ12)
       int_count += c;
+      i++
 
     }
     else if (isC) {
@@ -146,31 +149,36 @@ function isInside(points, Inp1) {
 }
 
 
-function isCrossing(c1, c2, c3, c4, Inp1, Inp2, Inq1, Inq2, vertexHit) {
+function isCrossing(c1, c2, c3, c4, Inp1, Inp2, Inq1, Inq2 ) {
   let first = false, second = false
+
   if ((c1[2] * c2[2]) < 0 && (c3[2] * c4[2]) < 0) {
     console.log("intersecting in line")
     return true
   }
 
-  else if (c1[2] == 0 && IsPointOnLine(Inq1, Inp1, Inp2)) {
-    console.log("hiting 1 vertex")
-    first = true
-    vertexHit = true;
+  else if (c1[2] == 0 && IsPointOnLine(Inq1, Inp1, Inp2)&&(c2[2]) == 0 && IsPointOnLine(Inq2, Inp1, Inp2) ) {
+    console.log("hiting 1  & 2 vertex")
+    first = true ;
+    second  = true
     return { first, second }
   }
+
+  else if (c1[2] == 0 && IsPointOnLine(Inq1, Inp1, Inp2)) {
+    console.log("hiting 1 vertex")
+    first = true 
+    return { first, second }
+  }
+
   else if ((c2[2]) == 0 && IsPointOnLine(Inq2, Inp1, Inp2)) {
     // i+1
     console.log("hiting 2 vertex")
-    second = true
-    vertexHit = true
+    second = true 
     return { first, second }
-  } else if (c3[2] == 0 && IsPointOnLine(Inp1, Inq1, Inq2)) {
-    vertexHit = true
+  } else if (c3[2] == 0 && IsPointOnLine(Inp1, Inq1, Inq2)) { 
     return true
   }
-  else if ((c4[2]) == 0 && IsPointOnLine(Inp2, Inq1, Inq2)) {
-    vertexHit = true
+  else if ((c4[2]) == 0 && IsPointOnLine(Inp2, Inq1, Inq2)) { 
     return true
   }
   return false;
@@ -182,16 +190,37 @@ function vertexType(position, vectorPP12, vectorQQ12) {
   let I = position;
   let vectorQQ1n;
   let qn = points[(I + (n - 1)) % n], q1 = points[I], q2 = points[(I + 1) % n];
+  vectorQQ12 = createVector(q1, q2);
   vectorQQ1n = createVector(q1, qn);
 
   let d1 = crossProduct(vectorPP12, vectorQQ12);
-  let d2 = crossProduct(vectorPP12, vectorQQ1n);
+  
+  let dn = crossProduct(vectorPP12, vectorQQ1n);
+  
   console.log("d1", d1)
-  console.log("d2", d2)
-  if ((d1[2] * d2[2]) < 0) {
+  console.log("dn", dn) 
+
+  while (d1[2] == 0) {
+    I = (I + 1)%n;
+    q1 = points[I], q2 = points[(I + 1) % n];
+    vectorQQ12 = createVector(q1, q2);
+    d1 = crossProduct(vectorPP12, vectorQQ12);
+  }
+  
+  // while (dn[2] == 0) {
+  //   I = (I - 1) % n;
+  //   q1 = points[I], qn = points[(I + (n-1)) % n];
+  //   vectorQQ1n= createVector(q1, qn);
+  //   dn = crossProduct(vectorPP12, vectorQQ1n);
+  // }
+ 
+ 
+  if ((d1[2] * dn[2]) < 0) {
     console.log("count 1 vertex")
     return 1
-  }
+
+  } 
+
   else {
     console.log("count 2 vertex")
     return 2
@@ -201,6 +230,7 @@ function vertexType(position, vectorPP12, vectorQQ12) {
 
 function IsPointOnLine(t, p1, p2) {
   let tx, ty, tz;
+  console.log("t,p1,p2",t,p1,p2)
   tx = (t[0] - p1[0]) / (p2[0] - p1[0]);
   if (tx > 1 || tx < 0) {
     console.log("points is not on edge")
@@ -310,10 +340,10 @@ function boundBoxPoints() {
   return target
 }
 
-const points = input[0]
+const points = input[7]
 // console.log("points", points)
 
-const num = 30;
+const num = 10;
 if (num == 0) {
   throw new Error("Error : Num is 0");
 }
