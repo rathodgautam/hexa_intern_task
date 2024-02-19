@@ -1,6 +1,6 @@
 
 //Final code for point in polygon
-import input from "../static/input.js";
+import input from "./input.js";
 // const points =  
 
 // calculate magnitude of vector
@@ -28,20 +28,17 @@ function createVector(p1, p2) {
 
 // two line intersecting or not 
 
-function intersectOrNot(cp11, cp12, cp21, cp22) { 
+function intersectOrNot(cp11, cp12, cp21, cp22) {
 
   if ((cp11[2] * cp12[2]) < 0 && (cp21[2] * cp22[2]) < 0) {
-    console.log("intersect");
     return true
   } else {
-    console.log("not intersect")
     return false
   }
 }
 
 // checking point is on the edge or not
 function onEdge(inPoints, inTarget) {
-  console.log("Onedge checking")
   let edge = false;
   let n = inPoints.length, m = inPoints[0].length;
   let tx, ty, tz;
@@ -57,25 +54,7 @@ function onEdge(inPoints, inTarget) {
     let mag = magnitude(cp[i]);
 
     if (mag == 0) {
-      let tx, ty, tz;
-      tx = (inTarget[0] - p1[0]) / (p2[0] - p1[0]);
-      if (tx > 1 || tx < 0) {
-        console.log("points is not on edge")
-        return false;
-      }
-      ty = (inTarget[1] - p1[1]) / (p2[1] - p1[1]);
-      if (ty > 1 || ty < 0) {
-        console.log("points is not on edge")
-        return false;
-      }
-      tz = (inTarget[2] - p1[2]) / (p2[2] - p1[2]);
-      if (tz > 1 || tz < 0) {
-        console.log("points is not on edge")
-        return false
-      }
-      // edge = true;
-      console.log("point is on a edge");
-      return true
+      IsPointOnLine(inTarget, p1, p2)
     }
   }
   return false
@@ -84,7 +63,6 @@ function onEdge(inPoints, inTarget) {
 // 
 
 function onVertex(inPoints, inTarget) {
-  console.log("onVertex checking")
   let vertex = false, at = [];
   let n = inPoints.length, m = inPoints[0].length;
 
@@ -92,7 +70,6 @@ function onVertex(inPoints, inTarget) {
     at[i] = createVector(inPoints[i], inTarget)
     let mag = magnitude(at[i])
     if (mag == 0) {
-      console.log('point is vertex')
       vertex = true;
       return true
     }
@@ -103,29 +80,35 @@ function onVertex(inPoints, inTarget) {
 function isInside(points, Inp1) {
 
   let xmax = 100, flagWD = false;
-  console.log("inInside")
-  let dir_count = 0;
+  let int_count = 0;
   let n = points.length;
   let Inp2 = [xmax, Inp1[1], Inp1[2]];
-  let Inq1, Inq2; 
+  let Inq1, Inq2;
+
   var vertexHit = false;
 
+  let lastP = false;
+
+  let vectorPP12 = createVector(Inp1, Inp2);
+
   for (let i = 0; i < n; i++) {
-      Inq1 = points[i],
-      Inq2 = points[(i + 1) % n]; 
+    if (lastP == true && i == n - 1) break;
+
+    Inq1 = points[i],
+      Inq2 = points[(i + 1) % n];
 
     let vectorPQ11 = [],
-      vectorPP12 = [],
       vectorPQ12 = [],
       vectorQP11 = [],
       vectorQP12 = [],
       vectorQQ12 = [];
 
-    vectorPP12 = createVector(Inp1, Inp2);
+
     vectorPQ11 = createVector(Inp1, Inq1);
     vectorPQ12 = createVector(Inp1, Inq2);
 
     vectorQQ12 = createVector(Inq1, Inq2);
+
     vectorQP11 = createVector(Inq1, Inp1);
     vectorQP12 = createVector(Inq1, Inp2);
 
@@ -137,34 +120,51 @@ function isInside(points, Inp1) {
     cp21 = crossProduct(vectorQQ12, vectorQP11);
     cp22 = crossProduct(vectorQQ12, vectorQP12);
 
-    // consider direction count of intersecting lines 
-    //  count !== 0 isInside
-    //  count == 0  outside
 
-    let isC =  isCrossing(cp11, cp12, cp21, cp22,Inp1,Inp2,Inq1,Inq2,vertexHit)
-   
-    if(isC){
-      cPQ = crossProduct(vectorPP12, vectorQQ12);
-      cPQ[2] >  0 ? dir_count ++  : dir_count --;
+    let isC = isCrossing(cp11, cp12, cp21, cp22, Inp1, Inp2, Inq1, Inq2, vertexHit)
+    let f = isC.first, s = isC.second;
+
+    if (f == true) {
+
+      ((i == 0) ?( lastP = true ): (i++));
+
+      let c = vertexType(i, vectorPP12, vectorQQ12)
+      int_count += c;
+
     }
-  }
-  
-  return dir_count
+    else if (s == true) {
+      i++
+      let c = vertexType(i + 1, vectorPP12, vectorQQ12)
+      int_count += c;
+
+    }
+    else if (isC) {
+      int_count++;
+    }
+  } 
+  return ((int_count % 2) == 1)
 }
 
 
-function isCrossing(c1, c2, c3, c4,Inp1,Inp2,Inq1,Inq2,vertexHit) {
-
+function isCrossing(c1, c2, c3, c4, Inp1, Inp2, Inq1, Inq2, vertexHit) {
+  let first = false, second = false
   if ((c1[2] * c2[2]) < 0 && (c3[2] * c4[2]) < 0) {
+    console.log("intersecting in line")
     return true
   }
-  else if (c1[2] == 0 && IsPointOnLine(Inq1, Inp1, Inp2)) { 
-    vertexHit = true
-    return true
+
+  else if (c1[2] == 0 && IsPointOnLine(Inq1, Inp1, Inp2)) {
+    console.log("hiting 1 vertex")
+    first = true
+    vertexHit = true;
+    return { first, second }
   }
   else if ((c2[2]) == 0 && IsPointOnLine(Inq2, Inp1, Inp2)) {
+    // i+1
+    console.log("hiting 2 vertex")
+    second = true
     vertexHit = true
-    return true
+    return { first, second }
   } else if (c3[2] == 0 && IsPointOnLine(Inp1, Inq1, Inq2)) {
     vertexHit = true
     return true
@@ -175,7 +175,30 @@ function isCrossing(c1, c2, c3, c4,Inp1,Inp2,Inq1,Inq2,vertexHit) {
   }
   return false;
 }
- 
+
+function vertexType(position, vectorPP12, vectorQQ12) {
+  console.log("vertexType")
+  let n = points.length
+  let I = position;
+  let vectorQQ1n;
+  let qn = points[(I + (n - 1)) % n], q1 = points[I], q2 = points[(I + 1) % n];
+  vectorQQ1n = createVector(q1, qn);
+
+  let d1 = crossProduct(vectorPP12, vectorQQ12);
+  let d2 = crossProduct(vectorPP12, vectorQQ1n);
+  console.log("d1", d1)
+  console.log("d2", d2)
+  if ((d1[2] * d2[2]) < 0) {
+    console.log("count 1 vertex")
+    return 1
+  }
+  else {
+    console.log("count 2 vertex")
+    return 2
+  }
+
+}
+
 function IsPointOnLine(t, p1, p2) {
   let tx, ty, tz;
   tx = (t[0] - p1[0]) / (p2[0] - p1[0]);
@@ -217,7 +240,7 @@ function boundary(inPoints) {
   return boundbox
 }
 
-function line_points(inboundBox) { 
+function line_points(inboundBox) {
   let boundLine = [];
   for (let k = 0; k < (inboundBox.length - 2); k++) {
     boundLine[k] = []
@@ -226,7 +249,7 @@ function line_points(inboundBox) {
       boundLine[k][i][0] = (inboundBox[0][0] * (1 - t) + (inboundBox[k + 1][0] * t)).toFixed(5);
       boundLine[k][i][1] = (inboundBox[0][1] * (1 - t) + (inboundBox[k + 1][1] * t)).toFixed(5);
     }
-  } 
+  }
   return boundLine
 
 }
@@ -264,7 +287,7 @@ function main() {
       inDicision.push(2)
       console.log("final edge")
     }
-    else if (isInside(points, target_p) !== 0) {
+    else if (isInside(points, target_p)) {
       inDicision.push(3)
       console.log("Intersect final", target_p)
     }
