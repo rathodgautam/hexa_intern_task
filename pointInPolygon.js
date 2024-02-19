@@ -1,6 +1,6 @@
 
 //Final code for point in polygon
-import input from "./input.js";
+import input from "../static/input";
 // const points =  
 
 // calculate magnitude of vector
@@ -41,11 +41,12 @@ function intersectOrNot(cp11, cp12, cp21, cp22) {
 function onEdge(inPoints, inTarget) { 
   let n = inPoints.length, m = inPoints[0].length; 
   let cp = [];
+  let edge = false;
   let inAb = [], inAt = [];
 
-  for (let i = 0; i < n; i++) {
-    console.log(inPoints[i], inPoints[(i + 1) % n])
+  for (let i = 0; i < n; i++) { 
     let p1 = inPoints[i], p2 = inPoints[(i + 1) % n];
+    console.log(inTarget,p1,p2)
 
     inAb[i] = createVector(p1, p2);
     inAt[i] = createVector(p1, inTarget)
@@ -53,10 +54,13 @@ function onEdge(inPoints, inTarget) {
     let mag = magnitude(cp[i]);
 
     if (mag == 0) {
-     return IsPointOnLine(inTarget, p1, p2)
+    edge =  IsPointOnLine(inTarget, p1, p2)
+    if(edge == true){
+        return true
+    }
     }
   }
-  return false
+  return edge
 }
 
 // 
@@ -247,6 +251,7 @@ function IsPointOnLine(t, p1, p2) {
   //   return false
   // }
   console.log("point is on a edge");
+
   return true
 }
 
@@ -340,10 +345,10 @@ function boundBoxPoints() {
   return target
 }
 
-const points = input[7]
+const points = input[8]
 // console.log("points", points)
 
-const num = 10;
+const num = 30;
 if (num == 0) {
   throw new Error("Error : Num is 0");
 }
