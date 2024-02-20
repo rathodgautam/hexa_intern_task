@@ -1,0 +1,177 @@
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import GUI from 'lil-gui';
+
+
+/**
+ * Debug
+ */
+// const gui = new GUI();
+
+// canvas 
+const canvas = document.querySelector('canvas.webgl');
+
+//Scene
+const scene = new THREE.Scene();
+
+// geometry Object
+let n = 10;
+let objects = [];
+
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({
+    color: 'blue'
+});
+
+for (let i = 0; i < n; i++) {
+    let obj = objects[i];
+    obj = new THREE.Mesh(geometry, material.clone());
+    obj.position.x = (Math.random() - 0.5) * 10
+    obj.position.y = (Math.random() - 0.5) * 1.7
+    obj.position.z = (Math.random() - 5) * 0.5
+
+    obj.updateMatrixWorld()
+    objects.push(obj)
+    scene.add(obj)
+}
+// console.log(objects)
+
+
+// raycaster.set(rayOrigin,rayDirection); 
+window.addEventListener("resize", () => {
+    sizes.width = window.innerWidth;
+    sizes.height = window.innerHeight;
+
+    camera.aspect = sizes.width / sizes.height;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(sizes.width, sizes.height);
+
+})
+
+// function(event) {
+//     // Check if the Ctrl key is held down
+//     if (event.ctrlKey) {
+//         // Ctrl + click detected
+//         console.log('Ctrl + click detected');
+//     } else {
+//         // Regular click
+//         console.log('Regular click');
+//     }
+// }
+
+let mouse = {};
+let cntrl = false; 
+let cntrlIntersect = [];
+window.addEventListener('click', (event) => {
+
+    mouse = new THREE.Vector2();
+    mouse.x = event.clientX / sizes.width * 2 - 1
+    mouse.y = -(event.clientY / sizes.height) * 2 + 1
+    console.log(mouse.x, mouse.y)
+    if (event.ctrlKey) {
+        // Ctrl + click detected 
+        cntrl = true
+        console.log('Ctrl + click detected',cntrlIntersect);
+
+    }else{
+
+        cntrl = false
+    }
+
+
+})
+
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+
+
+//Camera
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
+camera.position.z = 3
+scene.add(camera)
+
+
+// Orbit Controls
+const controls = new OrbitControls(camera, canvas);
+// controls.target.set(0, 0.75, 0)
+controls.enableDamping = true
+
+// controls.update();
+
+//Renderer
+const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: true
+});
+
+renderer.setSize(sizes.width, sizes.height);
+renderer.render(scene, camera);
+
+// Ray 
+
+const raycaster = new THREE.Raycaster();
+// const rayDirection = new THREE.Vector3(1,0,0)
+// rayDirection.normalize()
+// Animate
+
+const clock = new THREE.Clock()
+let previousTime = 0;
+
+const tick = () => {
+
+    const elapsedTime = clock.getElapsedTime();
+    const deltaTime = elapsedTime - previousTime;
+    previousTime = elapsedTime;
+
+    // console.log("0", mouse)
+    raycaster.setFromCamera(mouse, camera);
+ 
+    const intersects = raycaster.intersectObjects(objects);
+    // console.log(intersects)
+
+
+    if (cntrl && intersects) { 
+        cntrlIntersect.push(intersects[0].object)  
+        // console.log(cntrlIntersect)
+    }
+
+    // console.log("1", intersects)
+
+    for (const obj1 of objects) {
+        !cntrlIntersect.includes(obj1) && obj1.material.color.set('blue')
+    }
+
+    if (intersects.length || cntrlIntersect.length) {
+        
+        // console.log(" 2 , one is red over here", intersects[0], cntrlIntersect)
+        intersects[0].object.material.color.set('red')
+    }
+
+    // if(intersects.length)
+    // {
+
+    //     for(const obj2 of intersects)
+    //     {   console.log(obj2)
+    //         obj2.object.material.color.set('red')
+    //     }
+    // }
+
+    //  clear(intersects);
+    // console.log("3 , intersects after remove", intersects)
+
+
+    // control update
+    controls.update();
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+
+}
+
+tick()
