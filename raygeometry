@@ -13,6 +13,11 @@ const canvas = document.querySelector('canvas.webgl');
 
 //Scene
 const scene = new THREE.Scene();
+// Ray 
+  
+const raycaster = new THREE.Raycaster();
+// const rayDirection = new THREE.Vector3(1,0,0)
+// rayDirection.normalize()
 
 // geometry Object
 let n = 10;
@@ -49,16 +54,7 @@ window.addEventListener("resize", () => {
 
 })
 
-// function(event) {
-//     // Check if the Ctrl key is held down
-//     if (event.ctrlKey) {
-//         // Ctrl + click detected
-//         console.log('Ctrl + click detected');
-//     } else {
-//         // Regular click
-//         console.log('Regular click');
-//     }
-// }
+ 
 
 let mouse = {};
 let cntrl = false; 
@@ -79,16 +75,47 @@ window.addEventListener('click', (event) => {
         cntrl = false
     }
 
+    
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(objects);
+    // console.log(intersects)
+
+
+    if (cntrl && intersects) { 
+        if(!cntrlIntersect.includes(intersects[0].object)){
+          cntrlIntersect.push(intersects[0].object) 
+        }
+        let ele = cntrlIntersect.slice(-1)
+        ele[0].material.color.set('red') 
+    } 
+
+    for (const obj1 of objects) {
+        if(!cntrlIntersect.includes(obj1)){
+          obj1.material.color.set('blue')
+        } 
+
+        if(!cntrl){
+          obj1.material.color.set('blue')
+        }
+    }
+
+    if (intersects.length ) { 
+        intersects[0].object.material.color.set('red')
+    }
+    
+ 
+
+
 
 })
 
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
-}
-
-
-//Camera
+  }
+  
+  
+  //Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
 camera.position.z = 3
 scene.add(camera)
@@ -105,16 +132,12 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     antialias: true
-});
-
-renderer.setSize(sizes.width, sizes.height);
-renderer.render(scene, camera);
-
-// Ray 
-
-const raycaster = new THREE.Raycaster();
-// const rayDirection = new THREE.Vector3(1,0,0)
-// rayDirection.normalize()
+  });
+  
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.render(scene, camera);
+  
+  
 // Animate
 
 const clock = new THREE.Clock()
@@ -122,47 +145,12 @@ let previousTime = 0;
 
 const tick = () => {
 
-    const elapsedTime = clock.getElapsedTime();
-    const deltaTime = elapsedTime - previousTime;
-    previousTime = elapsedTime;
-
-    // console.log("0", mouse)
-    raycaster.setFromCamera(mouse, camera);
+    // const elapsedTime = clock.getElapsedTime();
+    // const deltaTime = elapsedTime - previousTime;
+    // previousTime = elapsedTime;
  
-    const intersects = raycaster.intersectObjects(objects);
-    // console.log(intersects)
-
-
-    if (cntrl && intersects) { 
-        cntrlIntersect.push(intersects[0].object)  
-        // console.log(cntrlIntersect)
-    }
-
-    // console.log("1", intersects)
-
-    for (const obj1 of objects) {
-        !cntrlIntersect.includes(obj1) && obj1.material.color.set('blue')
-    }
-
-    if (intersects.length || cntrlIntersect.length) {
-        
-        // console.log(" 2 , one is red over here", intersects[0], cntrlIntersect)
-        intersects[0].object.material.color.set('red')
-    }
-
-    // if(intersects.length)
-    // {
-
-    //     for(const obj2 of intersects)
-    //     {   console.log(obj2)
-    //         obj2.object.material.color.set('red')
-    //     }
-    // }
-
-    //  clear(intersects);
-    // console.log("3 , intersects after remove", intersects)
-
-
+ 
+   
     // control update
     controls.update();
 
